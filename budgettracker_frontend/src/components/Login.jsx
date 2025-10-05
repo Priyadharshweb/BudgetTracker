@@ -2,12 +2,14 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './Login.css'
 import BeforeLoginNav from '../navigationBar/BeforeLoginNav'
+import { useAuth } from '../context/AuthContext'
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -22,8 +24,8 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json()
-        localStorage.setItem('token', data.token)
-        navigate('/dashboard')
+        login(data.token)
+        navigate('/userDashboard')
       } else {
         setError('Invalid email or password')
       }

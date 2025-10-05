@@ -91,7 +91,7 @@
 .login-btn {
   width: 100%;
   padding: 15px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background:#d69914;
   color: white;
   border: none;
   border-radius: 8px;
@@ -99,10 +99,6 @@
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s ease;
-}
-
-.login-btn:hover {
-  transform: translateY(-2px);
 }
 
 .signup-link {

@@ -3,7 +3,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: #fff;
+  background-color: #ee3535;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   width: 100%;
   position: fixed;
@@ -28,19 +28,24 @@
 .nav-links {
   display: flex;
   list-style: none;
-  gap: 1.5rem;
+  gap: 1.9rem;
   margin: 0;
   padding: 0;
 }
 
 .nav-links li {
   cursor: pointer;
-  color: #666;
+  color: white;
   font-weight: 500;
   transition: color 0.3s ease;
+  font-style: bold;
 }
 
 .nav-links li:hover {
+  color: #007bff;
+}
+
+.nav-links li.active {
   color: #007bff;
 }
 
@@ -49,31 +54,36 @@
   gap: 1rem;
 }
 
-.login-btn, .signup-btn {
-  padding: 0.5rem 1.5rem;
-  border: none;
-  border-radius: 5px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.navbar .login-btn, .navbar .signup-btn {
+  padding: 0.5rem 1.5rem !important;
+  border: none !important;
+  border-radius: 5px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  width: auto !important;
 }
 
-.login-btn {
-  background-color: transparent;
-  color: #007bff;
-  border: 2px solid #007bff;
+.navbar .login-btn {
+  background-color: #8B4513 !important;
+  color: white !important;
+  border: 2px solid #8B4513 !important;
 }
 
-.login-btn:hover {
-  background-color: #007bff;
-  color: white;
+.navbar .login-btn:hover {
+  background-color: #A0522D !important;
+  border-color: #A0522D !important;
 }
 
-.signup-btn {
-  background-color: #007bff;
-  color: white;
+.navbar .signup-btn {
+  background-color: #8B4513 !important;
+  color: white !important;
+  border: 2px solid #8B4513 !important;
+  background: #8B4513 !important;
 }
 
-.signup-btn:hover {
-  background-color: #0056b3;
+.navbar .signup-btn:hover {
+  background-color: #A0522D !important;
+  border-color: #A0522D !important;
+  background: #A0522D !important;
 }

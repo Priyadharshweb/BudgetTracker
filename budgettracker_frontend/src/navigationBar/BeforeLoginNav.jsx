@@ -1,9 +1,10 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import './BeforeLoginNav.css'
 
 const BeforeLoginNav = () => {
   const navigate = useNavigate()
+  const location = useLocation()
 
   const handleLogin = () => {
     navigate('/login')
@@ -12,15 +13,23 @@ const BeforeLoginNav = () => {
   const handleSignup = () => {
     navigate('/signup')
   }
-
+  const handleHome=()=>{
+    navigate('/')
+  }
+  const handleFeatures=()=>{
+    navigate('/features')
+  }
+  const handleAbout=()=>{
+    navigate('/aboutUs')
+  }
   return (
     <nav className="navbar">
       <div className="nav-left">
         <div className="app-name">BudgetTracker</div>
         <ul className="nav-links">
-          <li>Home</li>
-          <li>Features</li>
-          <li>About Us</li>
+          <li onClick={handleHome} className={location.pathname === '/' ? 'active' : ''}>Home</li>
+          <li onClick={handleFeatures} className={location.pathname === '/features' ? 'active' : ''}>Features</li>
+          <li onClick={handleAbout} className={location.pathname === '/aboutUs' ? 'active' : ''}>About Us</li>
         </ul>
       </div>
       <div className="nav-right">

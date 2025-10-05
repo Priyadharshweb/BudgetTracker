@@ -1,0 +1,111 @@
+.hero-section {
+  height: 100vh !important;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 80px;
+  background: url('https://thumbor.forbes.com/thumbor/fit-in/x/https://www.forbes.com/uk/advisor/wp-content/uploads/2022/07/Budgeting-apps.jpg') no-repeat center center !important;
+  background-size: cover !important;
+  background-attachment: fixed;
+}
+
+.hero-title {
+  font-family: 'Dancing Script', cursive;
+  font-style: italic;
+  font-size: 42px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #6e4b00fd;
+  padding: 40px;
+  max-width: 500px;
+  text-align: left;
+  border-radius: 15px;
+  animation: float 3s ease-in-out infinite;
+  margin-right:600px;
+}
+
+.hero-title b {
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  display: block;
+  margin-top: 10px;
+}
+
+.hero-title button {
+  margin-top: 20px;
+  background-color: #fcd706;
+  color: #ffffff;
+  font-weight: bold;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Features Section */
+.features-section {
+  padding: 60px 20px;
+  background-color: #f5f5dc; /* Beige background */
+  text-align: center;
+}
+
+.features-title {
+  font-size: 32px;
+  margin-bottom: 40px;
+  font-weight: bold;
+  color: #3e2723; /* Dark brown title */
+}
+
+/* Cards Grid */
+.features-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
+}
+
+/* Single Feature Card */
+.feature-card {
+  background: #d2b48c; /* Light brown inner */
+  padding: 25px;
+  border-radius: 12px;
+  border: 2px solid #8b4513; /* Dark brown border */
+  width: 300px;
+  transition: transform 0.3s ease;
+  text-align: center;
+  color: #3e2723;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Icon */
+.feature-icon i {
+  font-size: 36px;
+  color: #4e342e;
+  margin-bottom: 15px;
+}
+
+/* Title */
+.feature-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Description */
+.feature-desc {
+  font-size: 14px;
+  color: #4e342e;
+}
