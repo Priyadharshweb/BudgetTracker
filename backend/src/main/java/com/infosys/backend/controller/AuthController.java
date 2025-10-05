@@ -16,9 +16,10 @@ import com.infosys.backend.repository.UserRepository;
 import com.infosys.backend.security.JwtUtil;
 
 import java.util.Optional;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@CrossOrigin(origins="http://localhost:5173/")
+@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 @RequestMapping("/api/auth")
 public class AuthController {
 
@@ -33,21 +34,57 @@ public class AuthController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @GetMapping("/profile")
+    public ResponseEntity<Users> getProfile(HttpServletRequest request) {
+        try {
+            String token = request.getHeader("Authorization");
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+                String email = jwtUtil.extractUsername(token);
+                Users user = userRepo.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+                return ResponseEntity.ok(user);
+            }
+            return ResponseEntity.status(401).body(null);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(null);
+        }
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<String> updateProfile(@RequestBody Users updatedUser, HttpServletRequest request) {
+        try {
+            String token = request.getHeader("Authorization");
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+                String email = jwtUtil.extractUsername(token);
+                Users user = userRepo.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+                
+                user.setName(updatedUser.getName());
+                user.setEmail(updatedUser.getEmail());
+                userRepo.save(user);
+                
+                return ResponseEntity.ok("Profile updated successfully");
+            }
+            return ResponseEntity.status(401).body("Unauthorized");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error updating profile");
+        }
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
-            // Authenticate user
             authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
 
-            // Fetch user details
             Users users = userRepo.findByEmail(request.getEmail())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            // Generate JWT token
             String token = jwtUtil.generateToken(users);
-
             return ResponseEntity.ok(new JwtResponse(token));
 
         } catch (BadCredentialsException e) {
@@ -55,7 +92,6 @@ public class AuthController {
         }
     }
 
-    // ✅ SIGNUP
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody Users user) {
         Optional<Users> existingUser = userRepo.findByEmail(user.getEmail());
@@ -63,10 +99,8 @@ public class AuthController {
             return ResponseEntity.badRequest().body("User already exists");
         }
 
-        // Encode password before saving
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        // Default role USER if not provided
         if (user.getRole() == null) {
             user.setRole(Role.USER);
         }
@@ -74,6 +108,4 @@ public class AuthController {
         userRepo.save(user);
         return ResponseEntity.ok("User registered successfully");
     }
-
 }
-
