@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import axios from 'axios'
 import AfterLogin from '../navigationBar/AfterLogin'
 import './EditProfile.css'
 
@@ -22,24 +23,23 @@ const Editprofile = () => {
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch('http://localhost:8080/api/auth/profile', {
+      const response = await axios.get('http://localhost:8080/api/auth/profile', {
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         }
       })
-      if (response.ok) {
-        const userData = await response.json()
-        setFormData({
-          firstName: userData.name?.split(' ')[0] || '',
-          lastName: userData.name?.split(' ')[1] || '',
-          email: userData.email || '',
-          gender: userData.gender || '',
-          birthDate: userData.birthDate || { day: '', month: '', year: '' },
-          currency: userData.currency || 'USD',
-          language: userData.language || 'english'
-        })
-        setProfileImage(userData.profileImage || '')
-      }
+
+      const userData = response.data
+      setFormData({
+        firstName: userData.name?.split(' ')[0] || '',
+        lastName: userData.name?.split(' ')[1] || '',
+        email: userData.email || '',
+        gender: userData.gender || '',
+        birthDate: userData.birthDate || { day: '', month: '', year: '' },
+        currency: userData.currency || 'USD',
+        language: userData.language || 'english'
+      })
+      setProfileImage(userData.profileImage || '')
     } catch (error) {
       console.error('Error fetching user data:', error)
     }
@@ -47,34 +47,35 @@ const Editprofile = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }))
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch('http://localhost:8080/api/auth/profile', {
-        method: 'PUT',
+      const payload = {
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        gender: formData.gender,
+        currency: formData.currency,
+        language: formData.language,
+        profileImage: profileImage // Optional: send image if backend supports it
+      }
+
+      await axios.put('http://localhost:8080/api/auth/profile', payload, {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          name: `${formData.firstName} ${formData.lastName}`,
-          email: formData.email,
-          gender: formData.gender,
-          currency: formData.currency,
-          language: formData.language
-        })
+          Authorization: `Bearer ${token}`
+        }
       })
-      if (response.ok) {
-        alert('Profile updated successfully!')
-        // Trigger a custom event to refresh the navbar
-        window.dispatchEvent(new CustomEvent('profileUpdated'))
-        // Reload the page after alert
-        window.location.reload()
-      }
+
+      alert('Profile updated successfully!')
+      window.dispatchEvent(new CustomEvent('profileUpdated'))
+      window.location.reload()
     } catch (error) {
       console.error('Error updating profile:', error)
     }
@@ -116,12 +117,12 @@ const Editprofile = () => {
             </ul>
           </nav>
         </div>
-        
+
         <div className="main-content">
           <form onSubmit={handleSubmit} className="profile-form">
             <fieldset className="form-section">
               <legend>Account Settings</legend>
-              
+
               <div className="profile-photo-section">
                 <label>Profile photo</label>
                 <div className="photo-controls">
@@ -180,7 +181,7 @@ const Editprofile = () => {
 
             <fieldset className="form-section">
               <legend>Localization settings</legend>
-              
+
               <div className="form-field">
                 <label htmlFor="currency">Account currency</label>
                 <select

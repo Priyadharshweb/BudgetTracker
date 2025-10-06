@@ -2,17 +2,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  width: 100vw; /* Ensure full width */
-  background:white;
-  padding: 20px;
-  box-sizing: border-box;
+  min-height: 80vh;
+  background: white;
+  padding: 80px 20px 20px 20px;
 }
 
 
 .signup-form {
   background: rgb(194, 192, 171);
-  padding: 40px;
+  padding: 30px;
   border-radius: 10px;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
   width: 100%;
@@ -50,7 +48,7 @@
 .signup-btn {
   width: 100%;
   padding: 15px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background:rgb(214, 141, 6);
   color: white;
   border: none;
   border-radius: 8px;

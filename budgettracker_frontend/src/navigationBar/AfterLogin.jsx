@@ -76,7 +76,7 @@ const AfterLogin = () => {
           </button>
           {showProfileDropdown && (
             <div className="profile-dropdown">
-              <button className="dropdown-option" onClick={() => navigate('/editProfile')}>Edit Profile</button>
+              <button className="dropdown-option" onClick={() => navigate('/editProfile')}>Settings</button>
               <button className="dropdown-option" onClick={handleLogout}>Logout</button>
             </div>
           )}
