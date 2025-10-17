@@ -9,18 +9,38 @@ import AboutUs from './components/AboutUs'
 import Editprofile from './userProfiles/Editprofile'
 import Transaction from './userProfiles/Transaction'
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <div>Error: {this.state.error?.message || 'Something went wrong'}</div>;
+    }
+    return this.props.children;
+  }
+}
+
 const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<Home/>}/>
-      <Route path="/signup" element={<Signup/>}/>
-      <Route path="/login" element={<Login/>}/>
-      <Route path="/features" element={<Features/>}/>
-      <Route path="/aboutUs" element={<AboutUs/>}/>
-      <Route path='/userDashboard' element={<UserDashboard/>}/>
-      <Route path="/editProfile" element={<Editprofile />} />
-      <Route path="/transaction" element={<Transaction/>}/>
-    </Routes>
+    <ErrorBoundary>
+      <Routes>
+        <Route path="/" element={<Home/>}/>
+        <Route path="/signup" element={<Signup/>}/>
+        <Route path="/login" element={<Login/>}/>
+        <Route path="/features" element={<Features/>}/>
+        <Route path="/aboutUs" element={<AboutUs/>}/>
+        <Route path='/userDashboard' element={<UserDashboard/>}/>
+        <Route path="/editProfile" element={<Editprofile />} />
+        <Route path="/transaction" element={<Transaction/>}/>
+      </Routes>
+    </ErrorBoundary>
   )
 }
 

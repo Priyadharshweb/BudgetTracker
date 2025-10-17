@@ -21,14 +21,15 @@ const TransactionDashboard = () => {
     fetchTransactions();
   }, []);
 
-  const fetchTransactions = async () => {
-    try {
-      const response = await transactionAPI.getTransactions();
-      setTransactions(response.data || []);
-    } catch (error) {
-      console.error('Error fetching transactions:', error.message);
-      setTransactions([]);
-    }
+  const fetchTransactions = () => {
+    transactionAPI.getTransactions()
+      .then(response => {
+        setTransactions(response.data || []);
+      })
+      .catch(error => {
+        console.error('Error fetching transactions:', error.message);
+        setTransactions([]);
+      });
   };
 
   const calculateSummary = () => {
@@ -46,32 +47,32 @@ const TransactionDashboard = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      const transactionData = {
-        type: formData.type,
-        amount: parseFloat(formData.amount),
-        category: formData.category,
-        description: formData.description,
-        date: formData.date,
-        user_id: 1 // This should be replaced with actual user ID from JWT token
-      };
-      
-      if (editingId) {
-        await transactionAPI.updateTransaction(editingId, transactionData);
-      } else {
-        await transactionAPI.createTransaction(transactionData);
-      }
-      
-      setShowForm(false);
-      setEditingId(null);
-      setFormData({ type: '', amount: '', category: '', description: '', date: '' });
-      fetchTransactions();
-    } catch (error) {
-      console.error('Error saving transaction:', error.message);
-      alert('Error saving transaction. Please try again.');
-    }
+    const transactionData = {
+      type: formData.type,
+      amount: parseFloat(formData.amount),
+      category: formData.category,
+      description: formData.description,
+      date: formData.date,
+      user_id: 1 // This should be replaced with actual user ID from JWT token
+    };
+    
+    const apiCall = editingId 
+      ? transactionAPI.updateTransaction(editingId, transactionData)
+      : transactionAPI.createTransaction(transactionData);
+    
+    apiCall
+      .then(() => {
+        setShowForm(false);
+        setEditingId(null);
+        setFormData({ type: '', amount: '', category: '', description: '', date: '' });
+        fetchTransactions();
+      })
+      .catch(error => {
+        console.error('Error saving transaction:', error.message);
+        alert('Error saving transaction. Please try again.');
+      });
   };
 
   const handleEdit = (transaction) => {
@@ -86,15 +87,16 @@ const TransactionDashboard = () => {
     setShowForm(true);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this transaction?')) {
-      try {
-        await transactionAPI.deleteTransaction(id);
-        fetchTransactions();
-      } catch (error) {
-        console.error('Error deleting transaction:', error.message);
-        alert('Error deleting transaction. Please try again.');
-      }
+      transactionAPI.deleteTransaction(id)
+        .then(() => {
+          fetchTransactions();
+        })
+        .catch(error => {
+          console.error('Error deleting transaction:', error.message);
+          alert('Error deleting transaction. Please try again.');
+        });
     }
   };
 

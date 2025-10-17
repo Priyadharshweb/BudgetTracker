@@ -7,7 +7,8 @@ import { useAuth } from '../context/AuthContext';
 import Footer from './Footer';
 const Home = () => {
   const navigate=useNavigate();
-  const { isAuthenticated } = useAuth();
+  const auth = useAuth();
+  const isAuthenticated = auth?.isAuthenticated || false;
   
   useEffect(() => {
     if (!isAuthenticated) {

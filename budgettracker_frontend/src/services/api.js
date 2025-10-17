@@ -20,6 +20,12 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 )
 
+export const authAPI = {
+  login: (credentials) => api.post('/auth/login', credentials),
+  signup: (userData) => api.post('/auth/signup', userData),
+  getProfile: () => api.get('/auth/profile'),
+}
+
 export const transactionAPI = {
   getTransactions: (params) => api.get('/transaction', { params }),
   createTransaction: (transactionData) => api.post('/transaction', transactionData),

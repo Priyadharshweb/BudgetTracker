@@ -8,7 +8,8 @@ import { transactionAPI } from '../services/api';
 import './UserDashboard.css';
 
 const UserDashboard = () => {
-  const { isAuthenticated } = useAuth();
+  const auth = useAuth();
+  const isAuthenticated = auth?.isAuthenticated || false;
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('This Month');

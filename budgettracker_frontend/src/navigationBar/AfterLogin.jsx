@@ -3,11 +3,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { FaUser, FaChevronDown } from 'react-icons/fa';
 import './AfterLogin.css';
 import { useAuth } from '../context/AuthContext';
+import { authAPI } from '../services/api';
 
 const AfterLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuth();
+  const auth = useAuth();
+  const logout = auth?.logout || (() => {});
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [fullName, setFullName] = useState(''); // Store user full name
 
@@ -15,14 +17,8 @@ const AfterLogin = () => {
     // Fetch current user info when component mounts
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:8080/api/auth/profile', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const user = await res.json();
-          setFullName(user.name);
-        }
+        const response = await authAPI.getProfile();
+        setFullName(response.data.name);
       } catch (err) {
         console.error('Failed to fetch user info', err);
       }

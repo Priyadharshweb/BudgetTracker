@@ -3,29 +3,22 @@ import { useNavigate } from 'react-router-dom'
 import './Login.css'
 import BeforeLoginNav from '../navigationBar/BeforeLoginNav'
 import { useAuth } from '../context/AuthContext'
-import axios from 'axios'
+import { authAPI } from '../services/api'
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const auth = useAuth()
+  const login = auth?.login || (() => {})
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const response = await axios.post('http://localhost:8080/api/auth/login', {
-        email,
-        password
-      })
-
-      // If response is successful
-      if (response.status === 200) {
-        const data = response.data
-        login(data.token)
-        navigate('/userDashboard')
-      }
+      const response = await authAPI.login({ email, password })
+      login(response.data.token)
+      navigate('/userDashboard')
     } catch (err) {
       console.error('Login error:', err)
       if (err.response && err.response.status === 401) {

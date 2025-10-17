@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './Signup.css'
 import BeforeLoginNav from '../navigationBar/BeforeLoginNav'
-import axios from 'axios'
+import { authAPI } from '../services/api'
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -28,17 +28,15 @@ const Signup = () => {
     setError('')
     setSuccess('')
     try {
-      const response = await axios.post('http://localhost:8080/api/auth/signup', {
+      const response = await authAPI.signup({
         name: formData.name,
         email: formData.email,
         password: formData.password,
         role: formData.role.toUpperCase()
       })
 
-      if (response.status === 200 || response.status === 201) {
-        setSuccess('User registered successfully!')
-        setTimeout(() => navigate('/login'), 2000)
-      }
+      setSuccess('User registered successfully!')
+      setTimeout(() => navigate('/login'), 2000)
     } catch (err) {
       console.error('Signup error:', err)
       if (err.response && err.response.data) {
