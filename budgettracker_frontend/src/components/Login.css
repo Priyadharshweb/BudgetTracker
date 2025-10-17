@@ -9,7 +9,7 @@
 
 
 .login-form {
-  background: rgb(230, 195, 195);
+  background:rgb(194, 192, 171);
   padding: 40px;
   border-radius: 12px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -89,7 +89,6 @@
 .login-btn {
   width: 100%;
   padding: 15px;
-  background:#d69914;
   color: white;
   border: none;
   border-radius: 8px;
@@ -117,8 +116,4 @@
   font-weight: 600;
   cursor: pointer;
   margin-left: 5px;
-}
-
-.signup-text:hover {
-  text-decoration: underline;
 }

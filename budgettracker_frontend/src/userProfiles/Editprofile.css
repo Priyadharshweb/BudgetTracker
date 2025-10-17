@@ -95,7 +95,7 @@
 }
 
 .upload-btn {
-  background: #007bff;
+  background: #34656D;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -105,7 +105,7 @@
 }
 
 .upload-btn:hover {
-  background: #0056b3;
+  background: #2a5259;
 }
 
 .remove-btn {
@@ -160,7 +160,7 @@
 }
 
 .update-btn {
-  background: #28a745;
+  background: #34656D;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -171,7 +171,7 @@
 }
 
 .update-btn:hover {
-  background: #218838;
+  background: #2a5259;
 }
 
 .update-btn:disabled {

@@ -1,14 +1,85 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AfterLogin from '../navigationBar/AfterLogin';
+import Footer from '../components/Footer';
 import { FaWallet, FaCalendarAlt, FaChevronDown } from 'react-icons/fa';
-
-import './UserDashboard.css'; // Import CSS
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { transactionAPI } from '../services/api';
+import './UserDashboard.css';
 
 const UserDashboard = () => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('This Month');
   const [dateRange, setDateRange] = useState('Oct 01, 2025 – Oct 31, 2025');
   const [showCalendar, setShowCalendar] = useState(false);
+  const [transactions, setTransactions] = useState([]);
+
+  const handleTransaction=()=>{
+    navigate('/transaction')
+  }
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/', { replace: true });
+    } else {
+      fetchTransactions();
+    }
+  }, [isAuthenticated, navigate]);
+
+  const fetchTransactions = async () => {
+    try {
+      const response = await transactionAPI.getTransactions();
+      setTransactions(response.data || []);
+    } catch (error) {
+      console.error('Error fetching transactions:', error.message);
+      setTransactions([]);
+    }
+  };
+
+  const calculateSummary = () => {
+    const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    const walletBalance = totalIncome - totalExpenses;
+    const periodChange = walletBalance;
+    
+    return { totalIncome, totalExpenses, walletBalance, periodChange };
+  };
+
+  const { totalIncome, totalExpenses, walletBalance, periodChange } = calculateSummary();
+
+  const getCategoryExpenses = () => {
+    const expenseTransactions = transactions.filter(t => t.type === 'expense');
+    const categoryTotals = {};
+    
+    expenseTransactions.forEach(transaction => {
+      const category = transaction.category || 'Other';
+      categoryTotals[category] = (categoryTotals[category] || 0) + parseFloat(transaction.amount);
+    });
+    
+    return Object.entries(categoryTotals).map(([category, amount]) => ({
+      category,
+      amount,
+      count: expenseTransactions.filter(t => (t.category || 'Other') === category).length
+    })).sort((a, b) => b.amount - a.amount);
+  };
+
+  const categoryExpenses = getCategoryExpenses();
+
+  const getCategoryIcon = (category) => {
+    const icons = {
+      food: '🍽️',
+      travel: '✈️',
+      bill: '📄',
+      home: '🏠',
+      car: '🚗',
+      family: '👨‍👩‍👧‍👦',
+      personal: '👤',
+      other: '📦'
+    };
+    return icons[category.toLowerCase()] || '📦';
+  };
 
   const periods = [
     { label: 'Last Week', value: 'last-week' },
@@ -94,10 +165,10 @@ const UserDashboard = () => {
             <div className="wallet-icon">
               <FaWallet size={30} color="#A26D3F" />
             </div>
-            <div>
+            <div onClick={handleTransaction}>
               <div className="wallet-title">Cash Wallet</div>
               <div className="wallet-subtitle">Cash</div>
-              <div className="wallet-amount">0.00 USD</div>
+              <div className="wallet-amount" style={{color: walletBalance >= 0 ? '#16c784' : '#dc3545'}}>{walletBalance >= 0 ? '+' : ''}{walletBalance.toFixed(2)} USD</div>
             </div>
           </div>
 
@@ -167,19 +238,19 @@ const UserDashboard = () => {
             <div className="balance-cards">
               <div className="balance-card">
                 <span className="balance-label">Total Balance</span>
-                <span className="balance-amount negative">0.00 USD</span>
+                <span className={`balance-amount ${walletBalance >= 0 ? 'positive' : 'negative'}`}>{walletBalance >= 0 ? '+' : ''}{walletBalance.toFixed(2)} USD</span>
               </div>
               <div className="balance-card">
                 <span className="balance-label">Total Period Change</span>
-                <span className="balance-amount negative">0.00 USD</span>
+                <span className={`balance-amount ${periodChange >= 0 ? 'positive' : 'negative'}`}>{periodChange >= 0 ? '+' : ''}{periodChange.toFixed(2)} USD</span>
               </div>
               <div className="balance-card">
                 <span className="balance-label">Total Period Expenses</span>
-                <span className="balance-amount negative">0.00 USD</span>
+                <span className="balance-amount negative">{totalExpenses.toFixed(2)} USD</span>
               </div>
               <div className="balance-card">
                 <span className="balance-label">Total Period Income</span>
-                <span className="balance-amount positive">0.00 USD</span>
+                <span className="balance-amount positive">+{totalIncome.toFixed(2)} USD</span>
               </div>
             </div>
 
@@ -196,21 +267,27 @@ const UserDashboard = () => {
 
             <div className="expenses-section">
               <h3>Period Expenses ({selectedPeriod})</h3>
-              <div className="expense-item">
-                <div className="expense-icon">🍽️</div>
-                <div className="expense-details">
-                  <span className="expense-category">Food & Drink</span>
-                  <span className="expense-transactions">0 transactions</span>
+              {categoryExpenses.length > 0 ? (
+                categoryExpenses.map((categoryData) => (
+                  <div key={categoryData.category} className="expense-item">
+                    <div className="expense-icon">{getCategoryIcon(categoryData.category)}</div>
+                    <div className="expense-details">
+                      <span className="expense-category">{categoryData.category.charAt(0).toUpperCase() + categoryData.category.slice(1)}</span>
+                      <span className="expense-transactions">{categoryData.count} transaction{categoryData.count !== 1 ? 's' : ''}</span>
+                    </div>
+                    <span className="expense-amount">{categoryData.amount.toFixed(2)} USD</span>
+                  </div>
+                ))
+              ) : (
+                <div className="transactions-list">
+                  <p className="no-transactions">No transactions found for {selectedPeriod.toLowerCase()}</p>
                 </div>
-                <span className="expense-amount">0.00 USD</span>
-              </div>
-              <div className="transactions-list">
-                <p className="no-transactions">No transactions found for {selectedPeriod.toLowerCase()}</p>
-              </div>
+              )}
             </div>
           </section>
         </div>
       </div>
+      <Footer />
     </>
   );
 };

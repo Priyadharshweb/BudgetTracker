@@ -7,6 +7,7 @@ import UserDashboard from './userProfiles/UserDashboard'
 import Features from './components/Features'
 import AboutUs from './components/AboutUs'
 import Editprofile from './userProfiles/Editprofile'
+import Transaction from './userProfiles/Transaction'
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
       <Route path="/aboutUs" element={<AboutUs/>}/>
       <Route path='/userDashboard' element={<UserDashboard/>}/>
       <Route path="/editProfile" element={<Editprofile />} />
+      <Route path="/transaction" element={<Transaction/>}/>
     </Routes>
   )
 }

@@ -44,13 +44,20 @@ const AfterLogin = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate('/', { replace: true });
+    window.history.pushState(null, null, window.location.pathname);
+    window.addEventListener('popstate', preventBack);
+  };
+
+  const preventBack = () => {
+    window.history.pushState(null, null, window.location.pathname);
   };
 
   const handleHome = () => navigate('/');
   const handleFeatures = () => navigate('/features');
   const handleAboutus = () => navigate('/aboutUs');
   const handleUserDash = () => navigate('/userDashboard');
+  const handleTransaction=()=> navigate('/transaction')
 
   return (
     <nav className="navbar">
@@ -61,7 +68,7 @@ const AfterLogin = () => {
           <li onClick={handleFeatures}>Features</li>
           <li onClick={handleAboutus}>About Us</li>
           <li onClick={handleUserDash} className={location.pathname === '/userDashboard' ? 'active' : ''}>My Dashboard</li>
-          <li>Transaction</li>
+          <li onClick={handleTransaction}>Transaction</li>
           <li>Cards</li>
           <li>Bank accounts</li>
           <li>Notifications</li>

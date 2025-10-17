@@ -1,40 +1,28 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './Home.css';
 import BeforeLoginNav from '../navigationBar/BeforeLoginNav';
 import AfterLogin from '../navigationBar/AfterLogin';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-
-const features = [
-  {
-    title: 'Shared wallets',
-    desc: 'are popular among couples, families and roommates who handle their finances in Spendee.',
-  },
-  {
-    title: 'Connecting bank accounts',
-    desc: 'to Spendee is preferred by people paying mostly by card.',
-  },
-  {
-    title: 'Customize Spendee',
-    desc: 'Customize your categories, add a picture or a location to every expense.',
-  },
-  {
-    title: 'Multiple currencies',
-    desc: 'are favoured by travellers and digital nomads managing money in more currencies.',
-  },
-  {
-    title: 'Alerts and reminders',
-    desc: 'will notify you to pay the bill or not to exceed the budget.',
-  },
-  {
-    title: 'Sync and backup',
-    desc: 'is valuable for everyone using Spendee across devices and sharing Spendee with others.',
-  },
-];
-
+import Footer from './Footer';
 const Home = () => {
   const navigate=useNavigate();
   const { isAuthenticated } = useAuth();
+  
+  useEffect(() => {
+    if (!isAuthenticated) {
+      const preventBack = () => {
+        window.history.pushState(null, null, window.location.pathname);
+      };
+      window.history.pushState(null, null, window.location.pathname);
+      window.addEventListener('popstate', preventBack);
+      
+      return () => {
+        window.removeEventListener('popstate', preventBack);
+      };
+    }
+  }, [isAuthenticated]);
+  
   const handleExplore=()=>{
     navigate("/signup")
   };
@@ -52,23 +40,50 @@ const Home = () => {
           <br></br>
         <button onClick={handleExplore}>Explore</button>
         </h1>
-      </div>
-
-      {/* Features Section */}
-      <div className="features-section">
-        <h2 className="features-title">Features our users love</h2>
-        <div className="features-cards">
-          {features.map((feature, index) => (
-            <div className="feature-card" key={index}>
-              <div className="feature-icon">
-                <i className={feature.icon}></i>
-              </div>
-              <div className="feature-title">{feature.title}</div>
-              <div className="feature-desc">{feature.desc}</div>
-            </div>
-          ))}
+        <div className="hero-image">
+          <img src="https://cdni.iconscout.com/illustration/premium/thumb/woman-doing-budget-tracking-illustration-svg-download-png-11253792.png" alt="Budget Tracking" />
         </div>
       </div>
+
+      {/* New Features Section */}
+      <section className="new-features-section">
+        <figure className="feature-figure">
+          <figcaption className="feature-caption">
+            <h3 className="feature-heading">Simple money tracker</h3>
+            <p className="feature-description">
+              It takes seconds to record daily transactions. Put them into clear and visualized categories such as Expense: Food, Shopping or Income: Salary, Gift.
+            </p>
+          </figcaption>
+          <div className="feature-image">
+            <img src="https://play-lh.googleusercontent.com/pUhXptAcWE-a2Px6R28or8GBOdyDjdAYXrqxGpNX4xNDjX1VDp3hUmaLY773ES_ZiHA=w240-h480-rw" alt="Transaction tracking" />
+          </div>
+        </figure>
+        
+        <figure className="feature-figure reverse">
+          <figcaption className="feature-caption">
+            <h3 className="feature-heading">Painless budgeting</h3>
+            <p className="feature-description">
+              It takes seconds to record daily transactions. Put them into clear and visualized categories such as Expense: Food, Shopping or Income: Salary, Gift.
+            </p>
+          </figcaption>
+          <div className="feature-image">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3M64NdImwoPoFnyG2dh_3KLvylUUSCtncSA&s" alt="Budget management" />
+          </div>
+        </figure>
+        
+        <figure className="feature-figure">
+          <figcaption className="feature-caption">
+            <h3 className="feature-heading">The whole picture in one place</h3>
+            <p className="feature-description">
+              One report to give a clear view on your spending patterns. Understand where your money comes and goes with easy-to-read graphs.
+            </p>
+          </figcaption>
+          <div className="feature-image">
+            <img src="https://assets.visme.co/templates/banners/thumbnails/i_Personal-Monthly-Budget-Allocation-Bar-Graph_full.jpg" alt="Financial reports" />
+          </div>
+        </figure>
+      </section>
+      <Footer/>
     </div>
   );
 };

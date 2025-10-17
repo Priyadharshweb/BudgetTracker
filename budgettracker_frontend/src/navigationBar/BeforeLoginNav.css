@@ -3,7 +3,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: #ee3535;
+  background-color:#ebe4e0;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   width: 100%;
   position: fixed;
@@ -11,6 +11,7 @@
   left: 0;
   z-index: 1000;
   box-sizing: border-box;
+  height: 55px;
 }
 
 .nav-left {
@@ -65,25 +66,25 @@
 }
 
 .navbar .login-btn {
-  background-color: #8B4513 !important;
+  background-color: #34656D !important;
   color: white !important;
-  border: 2px solid #8B4513 !important;
+  border: 2px solid #34656D !important;
 }
 
 .navbar .login-btn:hover {
-  background-color: #A0522D !important;
-  border-color: #A0522D !important;
+  background-color: #2a5259 !important;
+  border-color: #2a5259 !important;
 }
 
 .navbar .signup-btn {
-  background-color: #8B4513 !important;
+  background-color: #34656D !important;
   color: white !important;
-  border: 2px solid #8B4513 !important;
-  background: #8B4513 !important;
+  border: 2px solid #34656D !important;
+  background: #34656D !important;
 }
 
 .navbar .signup-btn:hover {
-  background-color: #A0522D !important;
-  border-color: #A0522D !important;
-  background: #A0522D !important;
+  background-color: #2a5259 !important;
+  border-color: #2a5259 !important;
+  background: #2a5259 !important;
 }
