@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Transaction.css';
-import { FaPlusCircle, FaRegClock, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaPlusCircle, FaRegClock, FaEdit, FaTrash, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import AfterLogin from '../navigationBar/AfterLogin';
 import Footer from '../components/Footer';
-import { transactionAPI } from '../services/api';
+import { transactionAPI, authAPI } from '../services/api';
 
 const TransactionDashboard = () => {
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [noteFilter, setNoteFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
+  const [userName, setUserName] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
   const [formData, setFormData] = useState({
     type: '',
     amount: '',
@@ -18,13 +27,35 @@ const TransactionDashboard = () => {
   });
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login', { replace: true });
+      return;
+    }
     fetchTransactions();
-  }, []);
+    fetchUserName();
+  }, [navigate]);
+
+  const fetchUserName = async () => {
+    try {
+      const response = await authAPI.getProfile();
+      setUserName(response.data.name || 'User');
+    } catch (error) {
+      console.error('Error fetching user name:', error);
+      setUserName('User');
+    }
+  };
+
+  useEffect(() => {
+    applyFilters();
+  }, [categoryFilter, noteFilter, typeFilter, transactions]);
 
   const fetchTransactions = () => {
     transactionAPI.getTransactions()
       .then(response => {
-        setTransactions(response.data || []);
+        const sortedTransactions = (response.data || []).sort((a, b) => new Date(b.date) - new Date(a.date));
+        setTransactions(sortedTransactions);
+        setFilteredTransactions(sortedTransactions);
       })
       .catch(error => {
         console.error('Error fetching transactions:', error.message);
@@ -32,9 +63,47 @@ const TransactionDashboard = () => {
       });
   };
 
+  const getUsedCategories = () => {
+    const categories = [...new Set(transactions.map(t => t.category).filter(Boolean))];
+    return categories.sort();
+  };
+
+  const applyFilters = () => {
+    let filtered = transactions;
+    
+    if (categoryFilter) {
+      filtered = filtered.filter(t => t.category === categoryFilter);
+    }
+    
+    if (noteFilter) {
+      filtered = filtered.filter(t => 
+        (t.description && t.description.toLowerCase().includes(noteFilter.toLowerCase()))
+      );
+    }
+    
+    if (typeFilter) {
+      filtered = filtered.filter(t => t.type === typeFilter);
+    }
+    
+    setFilteredTransactions(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const handleCategoryFilter = (category) => {
+    setCategoryFilter(category);
+  };
+
+  const handleNoteFilter = (note) => {
+    setNoteFilter(note);
+  };
+
+  const handleTypeFilter = (type) => {
+    setTypeFilter(type);
+  };
+
   const calculateSummary = () => {
-    const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    const totalIncome = filteredTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+    const totalExpenses = filteredTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + parseFloat(t.amount), 0);
     const walletBalance = totalIncome - totalExpenses;
     const periodChange = walletBalance;
     
@@ -42,6 +111,16 @@ const TransactionDashboard = () => {
   };
 
   const { totalIncome, totalExpenses, walletBalance, periodChange } = calculateSummary();
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentTransactions = filteredTransactions.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -54,8 +133,7 @@ const TransactionDashboard = () => {
       amount: parseFloat(formData.amount),
       category: formData.category,
       description: formData.description,
-      date: formData.date,
-      user_id: 1 // This should be replaced with actual user ID from JWT token
+      date: formData.date
     };
     
     const apiCall = editingId 
@@ -68,6 +146,14 @@ const TransactionDashboard = () => {
         setEditingId(null);
         setFormData({ type: '', amount: '', category: '', description: '', date: '' });
         fetchTransactions();
+        setCategoryFilter('');
+        setNoteFilter('');
+        setTypeFilter('');
+        // Trigger budget update
+        localStorage.setItem('transactionUpdated', Date.now().toString());
+        localStorage.removeItem('transactionUpdated');
+        // Dispatch custom event for same window
+        window.dispatchEvent(new CustomEvent('transactionUpdated'));
       })
       .catch(error => {
         console.error('Error saving transaction:', error.message);
@@ -92,6 +178,14 @@ const TransactionDashboard = () => {
       transactionAPI.deleteTransaction(id)
         .then(() => {
           fetchTransactions();
+          setCategoryFilter('');
+          setNoteFilter('');
+          setTypeFilter('');
+          // Trigger budget update
+          localStorage.setItem('transactionUpdated', Date.now().toString());
+          localStorage.removeItem('transactionUpdated');
+          // Dispatch custom event for same window
+          window.dispatchEvent(new CustomEvent('transactionUpdated'));
         })
         .catch(error => {
           console.error('Error deleting transaction:', error.message);
@@ -112,21 +206,33 @@ const TransactionDashboard = () => {
       <div className="filters-section" style={{display: 'flex', gap: '15px', alignItems: 'flex-end'}}>
         <div className="filter">
           <label>By category</label>
-          <select>
-            <option>All categories</option>
+          <select value={categoryFilter} onChange={(e) => handleCategoryFilter(e.target.value)}>
+            <option value="">All categories</option>
+            {getUsedCategories().map(category => (
+              <option key={category} value={category}>{category}</option>
+            ))}
           </select>
         </div>
         <div className="filter">
           <label>By people</label>
-          <div className="people-chip">P pri v</div>
+          <div className="people-chip">{userName}</div>
         </div>
         <div className="filter">
           <label>By note</label>
-          <input type="text" placeholder="Filter by specific keyword" />
+          <input 
+            type="text" 
+            placeholder="Filter by specific keyword" 
+            value={noteFilter}
+            onChange={(e) => handleNoteFilter(e.target.value)}
+          />
         </div>
         <div className="filter">
-          <label>By amount</label>
-          <input type="range" min="0" max="100" />
+          <label>By type</label>
+          <select value={typeFilter} onChange={(e) => handleTypeFilter(e.target.value)}>
+            <option value="">All types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
         </div>
         <button className="reset-filters">Reset filters</button>
       </div>
@@ -169,29 +275,97 @@ const TransactionDashboard = () => {
       </div>
 
       <div className="transaction-list">
-        {transactions.map((transaction) => (
-          <div key={transaction.id} className="transaction-item" style={{display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '1px solid #eee'}}>
-            <input type="checkbox" />
-            <div className="transaction-icon" style={{marginRight: '10px'}}>
-              <FaRegClock />
+        {currentTransactions.length > 0 ? (
+          currentTransactions.map((transaction) => (
+            <div key={transaction.id} className="transaction-item" style={{display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '1px solid #eee'}}>
+              <div style={{marginRight: '10px', fontSize: '16px'}}>
+                {transaction.type === 'income' ? 
+                  <FaArrowUp style={{color: '#28a745'}} /> : 
+                  <FaArrowDown style={{color: '#dc3545'}} />
+                }
+              </div>
+              <div className="transaction-icon" style={{marginRight: '10px'}}>
+                <FaRegClock />
+              </div>
+              <div className="transaction-details" style={{flex: 1}}>
+                <p className="transaction-title">{transaction.description || transaction.category}</p>
+                <small>{transaction.date} • <span style={{backgroundColor: '#C27E3B', color: 'white', padding: '2px 6px', borderRadius: '4px', fontSize: '11px'}}>{transaction.category}</span></small>
+              </div>
+              <div className="transaction-amount" style={{marginRight: '10px', color: transaction.type === 'income' ? 'green' : 'red'}}>
+                {transaction.type === 'income' ? '+' : '-'}{transaction.amount} USD
+              </div>
+              <div className="transaction-actions" style={{display: 'flex', gap: '5px'}}>
+                <button onClick={() => handleEdit(transaction)} style={{background: 'none', border: 'none', color: '#007bff', cursor: 'pointer'}}>
+                  <FaEdit />
+                </button>
+                <button onClick={() => handleDelete(transaction.id)} style={{background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer'}}>
+                  <FaTrash />
+                </button>
+              </div>
             </div>
-            <div className="transaction-details" style={{flex: 1}}>
-              <p className="transaction-title">{transaction.description || transaction.category}</p>
-              <small>{transaction.date}</small>
-            </div>
-            <div className="transaction-amount" style={{marginRight: '10px', color: transaction.type === 'income' ? 'green' : 'red'}}>
-              {transaction.type === 'income' ? '+' : '-'}{transaction.amount} USD
-            </div>
-            <div className="transaction-actions" style={{display: 'flex', gap: '5px'}}>
-              <button onClick={() => handleEdit(transaction)} style={{background: 'none', border: 'none', color: '#007bff', cursor: 'pointer'}}>
-                <FaEdit />
-              </button>
-              <button onClick={() => handleDelete(transaction.id)} style={{background: 'none', border: 'none', color: '#dc3545', cursor: 'pointer'}}>
-                <FaTrash />
-              </button>
-            </div>
+          ))
+        ) : (
+          <div style={{textAlign: 'center', padding: '40px', color: '#6c757d'}}>
+            <p>No results found</p>
           </div>
-        ))}
+        )}
+        
+        {/* Pagination */}
+        {filteredTransactions.length > itemsPerPage && (
+          <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginTop: '20px', padding: '20px'}}>
+            <button 
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              style={{
+                padding: '8px 12px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                backgroundColor: currentPage === 1 ? '#f8f9fa' : 'white',
+                color: currentPage === 1 ? '#6c757d' : '#34656D',
+                cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
+              }}
+            >
+              Previous
+            </button>
+            
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  backgroundColor: currentPage === page ? '#34656D' : 'white',
+                  color: currentPage === page ? 'white' : '#34656D',
+                  cursor: 'pointer',
+                  fontWeight: currentPage === page ? 'bold' : 'normal'
+                }}
+              >
+                {page}
+              </button>
+            ))}
+            
+            <button 
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              style={{
+                padding: '8px 12px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                backgroundColor: currentPage === totalPages ? '#f8f9fa' : 'white',
+                color: currentPage === totalPages ? '#6c757d' : '#34656D',
+                cursor: currentPage === totalPages ? 'not-allowed' : 'pointer'
+              }}
+            >
+              Next
+            </button>
+            
+            <span style={{marginLeft: '15px', color: '#6c757d', fontSize: '14px'}}>
+              Showing {startIndex + 1}-{Math.min(endIndex, filteredTransactions.length)} of {filteredTransactions.length} transactions
+            </span>
+          </div>
+        )}
       </div>
     </div>
 
@@ -243,7 +417,7 @@ const TransactionDashboard = () => {
       </div>
     )}
     </div>
-    <Footer />
+    
     </>
   );
 };

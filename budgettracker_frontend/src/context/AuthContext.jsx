@@ -30,6 +30,8 @@ const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     setIsAuthenticated(false);
+    // Clear any cached data
+    localStorage.clear();
   };
 
   return (

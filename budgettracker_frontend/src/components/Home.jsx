@@ -11,10 +11,19 @@ const Home = () => {
   const isAuthenticated = auth?.isAuthenticated || false;
   
   useEffect(() => {
-    if (!isAuthenticated) {
+    // Check if user just logged out
+    const justLoggedOut = localStorage.getItem('justLoggedOut');
+    
+    if (!isAuthenticated || justLoggedOut) {
       const preventBack = () => {
         window.history.pushState(null, null, window.location.pathname);
       };
+      
+      // Clear the logout flag
+      if (justLoggedOut) {
+        localStorage.removeItem('justLoggedOut');
+      }
+      
       window.history.pushState(null, null, window.location.pathname);
       window.addEventListener('popstate', preventBack);
       

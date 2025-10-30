@@ -8,6 +8,8 @@ import Features from './components/Features'
 import AboutUs from './components/AboutUs'
 import Editprofile from './userProfiles/Editprofile'
 import Transaction from './userProfiles/Transaction'
+import Budget from './userProfiles/Budget'
+import Savings from './userProfiles/Savings'
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -39,6 +41,8 @@ const App = () => {
         <Route path='/userDashboard' element={<UserDashboard/>}/>
         <Route path="/editProfile" element={<Editprofile />} />
         <Route path="/transaction" element={<Transaction/>}/>
+        <Route path="/budget" element={<Budget/>}/>
+        <Route path="/savings" element={<Savings/>}/>
       </Routes>
     </ErrorBoundary>
   )

@@ -38,15 +38,13 @@
   cursor: pointer;
   color: #666;
   font-weight: 500;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .nav-links li:hover {
-  color: #007bff;
-}
-
-.nav-links li.active {
-  color: #007bff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .profile-container {
@@ -161,4 +159,17 @@
 
 .signup-btn:hover {
   background-color: #2a5259;
+}
+
+/* Notification icon dancing animation */
+@keyframes notificationDance {
+  0% { transform: translateX(0px); }
+  25% { transform: translateX(10px); }
+  50% { transform: translateX(-5px); }
+  75% { transform: translateX(8px); }
+  100% { transform: translateX(0px); }
+}
+
+.notification-dance {
+  animation: notificationDance 1.5s ease-in-out 3;
 }

@@ -34,4 +34,18 @@ export const transactionAPI = {
   getTransactionById: (id) => api.get(`/transaction/${id}`),
 }
 
+export const budgetAPI = {
+  getBudgets: () => api.get('/budget'),
+  createBudget: (budgetData) => api.post('/budget', budgetData),
+  updateBudget: (id, budgetData) => api.put(`/budget/${id}`, budgetData),
+  deleteBudget: (id) => api.delete(`/budget/${id}`),
+}
+
+export const savingsAPI = {
+  getSavings: () => api.get('/savings'),
+  createSaving: (savingData) => api.post('/savings', savingData),
+  updateSaving: (id, savingData) => api.put(`/savings/${id}`, savingData),
+  deleteSaving: (id) => api.delete(`/savings/${id}`),
+}
+
 export default api
