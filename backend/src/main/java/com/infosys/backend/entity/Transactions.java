@@ -24,7 +24,7 @@ public class Transactions {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-	private Users user_id;
+	private Users user;
 	
 	@Column(name="type")
 	private String type;

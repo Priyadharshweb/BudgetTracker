@@ -22,7 +22,7 @@ public class Savings {
     private Long id;
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-	private Users user_id;
+	private Users user;
 	@Column(name="goal_name")
 	private String goal_name;
 	@Column(name="target_amt")

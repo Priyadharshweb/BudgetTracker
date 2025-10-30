@@ -20,7 +20,7 @@ public class Budget {
     private Long id;
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-	private Users user_id;
+	private Users user;
 	private String category;
 	private double amount;
 	@Column(name="startDate")

@@ -46,7 +46,7 @@ public class TransactionService {
             Users user = userRepo.findById(dto.getUser_id())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            transaction.setUser_id(user);
+            transaction.setUser(user);
             transaction.setType(dto.getType());
             transaction.setAmount(dto.getAmount());
             transaction.setCategory(dto.getCategory());
