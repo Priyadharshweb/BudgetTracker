@@ -6,7 +6,7 @@
     <link
   rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-  integrity="sha512-dN6E+Rh1jU1+RgC6F0JCFYx8+Ln1RwQ25FTT9Zm1IRfZbdt3XIk5BB7t7X4zVxd8Pz8K6Hx3dyz5BNM8+EM4DQ=="
+  integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw=="
   crossorigin="anonymous"
   referrerpolicy="no-referrer"
 />
@@ -16,6 +16,12 @@
     <title>budgettracker</title>
   </head>
   <body>
+    <script>
+      // Prevent visibilityState redefinition error
+      if (Object.getOwnPropertyDescriptor(Document.prototype, 'visibilityState')) {
+        delete Document.prototype.visibilityState;
+      }
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">

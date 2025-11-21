@@ -6,7 +6,7 @@ import './AfterLogin.css';
 import { useAuth } from '../context/AuthContext';
 import { authAPI, budgetAPI, transactionAPI } from '../services/api';
 
-const AfterLogin = () => {
+const AdminNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const auth = useAuth();
@@ -133,7 +133,8 @@ const AfterLogin = () => {
   };
   const handleUsers=()=>{
     if (userRole === 'ADMIN') {
-      navigate('/admin-users');
+      navigate('/admin-dashboard');
+      setAdminActiveTab('users');
     }
   };
 
@@ -172,8 +173,8 @@ const AfterLogin = () => {
             <li 
               onClick={handleUsers}
               style={{
-                backgroundColor: location.pathname === '/admin-users' ? 'rgb(52, 101, 109)' : 'transparent',
-                color: location.pathname === '/admin-users' ? 'white' : '#666',
+                backgroundColor: (location.pathname === '/admin-dashboard' && adminActiveTab === 'users') ? 'rgb(52, 101, 109)' : 'transparent',
+                color: (location.pathname === '/admin-dashboard' && adminActiveTab === 'users') ? 'white' : '#666',
                 borderRadius: '25px',
                 padding: '8px 16px',
                 transition: 'all 0.3s ease',
@@ -325,4 +326,4 @@ const AfterLogin = () => {
   );
 };
 
-export default AfterLogin;
+export default AdminNav;

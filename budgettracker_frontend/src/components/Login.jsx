@@ -17,8 +17,19 @@ const Login = () => {
     e.preventDefault()
     try {
       const response = await authAPI.login({ email, password })
-      login(response.data.token)
-      navigate('/userDashboard')
+      console.log('Login response:', response.data)
+      const { token, user } = response.data
+      console.log('User object:', user)
+      console.log('User role:', user?.role)
+      localStorage.setItem('token', token)
+      login(user, token)
+      
+      // Navigate based on user role
+      if (user && user.role === 'ADMIN') {
+        navigate('/admin-dashboard')
+      } else {
+        navigate('/user-dashboard')
+      }
     } catch (err) {
       console.error('Login error:', err)
       if (err.response && err.response.status === 401) {

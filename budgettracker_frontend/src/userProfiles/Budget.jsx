@@ -238,7 +238,7 @@ const Budget = () => {
                   fontSize: '16px'
                 }}
               >
-                💰 Savings Goal
+                 Savings Goal
               </button>
             </div>
           </div>
@@ -262,14 +262,14 @@ const Budget = () => {
               }}
             >
               <option value="">All categories</option>
-              <option value="food">🍽️ Food</option>
-              <option value="travel">✈️ Travel</option>
-              <option value="bill">📄 Bill</option>
-              <option value="home">🏠 Home</option>
-              <option value="car">🚗 Car</option>
-              <option value="family">👨👩👧👦 Family</option>
-              <option value="personal">👤 Personal</option>
-              <option value="other">📦 Other</option>
+              <option value="food">Food</option>
+              <option value="travel"> Travel</option>
+              <option value="bill">Bill</option>
+              <option value="home">Home</option>
+              <option value="car"> Car</option>
+              <option value="family">Family</option>
+              <option value="personal"> Personal</option>
+              <option value="other">Other</option>
             </select>
           </div>
 
@@ -305,8 +305,8 @@ const Budget = () => {
                     </div>
                     <div style={{display: 'flex', alignItems: 'center', gap: '20px'}}>
                       <div style={{textAlign: 'right'}}>
-                        <div style={{fontSize: '14px', color: '#6c757d', marginBottom: '4px'}}>Spent: ${budget.spent.toFixed(2)}</div>
-                        <div style={{fontSize: '14px', color: '#6c757d'}}>Budget: ${budget.amount.toFixed(2)}</div>
+                        <div style={{fontSize: '14px', color: '#6c757d', marginBottom: '4px'}}>Spent: ₹{budget.spent.toFixed(2)}</div>
+                        <div style={{fontSize: '14px', color: '#6c757d'}}>Budget: ₹{budget.amount.toFixed(2)}</div>
                       </div>
                       <div style={{display: 'flex', gap: '8px'}}>
                         <button onClick={() => handleEdit(budget)} style={{background: 'none', border: 'none', color: '#007bff', cursor: 'pointer', fontSize: '18px', padding: '5px'}}>
@@ -341,7 +341,7 @@ const Budget = () => {
                         fontWeight: 'bold',
                         color: isOverBudget ? '#dc3545' : '#28a745'
                       }}>
-                        ${(budget.amount - budget.spent).toFixed(2)} {isOverBudget ? 'over budget' : 'remaining'}
+                        ₹{(budget.amount - budget.spent).toFixed(2)} {isOverBudget ? 'over budget' : 'remaining'}
                       </span>
                       <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
                         <button 
@@ -604,7 +604,7 @@ const Budget = () => {
                           fontWeight: 'bold',
                           color: transaction.type === 'income' ? '#28a745' : '#dc3545'
                         }}>
-                          {transaction.type === 'income' ? '+' : '-'}${transaction.amount}
+                          {transaction.type === 'income' ? '+' : '-'}₹{transaction.amount}
                         </div>
                       </div>
                     ))

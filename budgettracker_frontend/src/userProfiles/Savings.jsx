@@ -231,16 +231,16 @@ const Savings = () => {
                   <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px'}}>
                     <div>
                       <div style={{fontSize: '12px', color: '#6c757d'}}>Current</div>
-                      <div style={{fontSize: '18px', fontWeight: 'bold', color: '#28a745'}}>${saving.curr_amt.toFixed(2)}</div>
+                      <div style={{fontSize: '18px', fontWeight: 'bold', color: '#28a745'}}>₹{saving.curr_amt.toFixed(2)}</div>
                     </div>
                     <div>
                       <div style={{fontSize: '12px', color: '#6c757d'}}>Target</div>
-                      <div style={{fontSize: '18px', fontWeight: 'bold', color: '#34656D'}}>${saving.target_amt.toFixed(2)}</div>
+                      <div style={{fontSize: '18px', fontWeight: 'bold', color: '#34656D'}}>₹{saving.target_amt.toFixed(2)}</div>
                     </div>
                     <div>
                       <div style={{fontSize: '12px', color: '#6c757d'}}>Remaining</div>
                       <div style={{fontSize: '18px', fontWeight: 'bold', color: isCompleted ? '#28a745' : '#dc3545'}}>
-                        ${Math.max(0, saving.target_amt - saving.curr_amt).toFixed(2)}
+                        ₹{Math.max(0, saving.target_amt - saving.curr_amt).toFixed(2)}
                       </div>
                     </div>
                   </div>

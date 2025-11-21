@@ -4,6 +4,9 @@ import Home from './components/Home'
 import Signup from './components/Signup'
 import Login from './components/Login'
 import UserDashboard from './userProfiles/UserDashboard'
+import AdminDashboard from './AdminProfile/adminDashboard'
+import TransactionAdminPage from './AdminProfile/TransactionAdminPage'
+import UserList from './AdminProfile/UserList'
 import Features from './components/Features'
 import AboutUs from './components/AboutUs'
 import Editprofile from './userProfiles/Editprofile'
@@ -39,6 +42,10 @@ const App = () => {
         <Route path="/features" element={<Features/>}/>
         <Route path="/aboutUs" element={<AboutUs/>}/>
         <Route path='/userDashboard' element={<UserDashboard/>}/>
+        <Route path='/user-dashboard' element={<UserDashboard/>}/>
+        <Route path='/admin-dashboard' element={<AdminDashboard/>}/>
+        <Route path='/admin-transactions' element={<TransactionAdminPage/>}/>
+        <Route path='/admin-users' element={<UserList/>}/>
         <Route path="/editProfile" element={<Editprofile />} />
         <Route path="/transaction" element={<Transaction/>}/>
         <Route path="/budget" element={<Budget/>}/>
