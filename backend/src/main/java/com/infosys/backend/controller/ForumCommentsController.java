@@ -1,10 +1,11 @@
 package com.infosys.backend.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 import com.infosys.backend.dto.ForumCommentsDTO;
 import com.infosys.backend.entity.ForumComments;
@@ -14,37 +15,72 @@ import com.infosys.backend.repository.ForumPostsRepository;
 import com.infosys.backend.repository.UserRepository;
 import com.infosys.backend.service.ForumCommentsService;
 
-
 @RestController
+@CrossOrigin(origins = "http://localhost:5173/")
 @RequestMapping("/api/comments")
 public class ForumCommentsController {
-	 @Autowired
-	    private ForumCommentsService commentsService;
 
-	    @Autowired
-	    private ForumPostsRepository postRepo;
+    @Autowired
+    private ForumCommentsService commentsService;
 
-	    @Autowired
-	    private UserRepository userRepo;
+    @Autowired
+    private ForumPostsRepository postRepo;
 
-	    @PostMapping
-	    public ForumComments createComment(@RequestBody ForumCommentsDTO dto) {
-	        ForumPost post = postRepo.findById(dto.getPost_id())
-	                                 .orElseThrow(() -> new RuntimeException("Post not found"));
-	        
-	        Users user = userRepo.findById(dto.getUser_id())
-	                             .orElseThrow(() -> new RuntimeException("User not found"));
+    @Autowired
+    private UserRepository userRepo;
 
-	        ForumComments comment = new ForumComments();
-	        comment.setPost_id(post);
-	        comment.setUser_id(user);
-	        comment.setComments(dto.getComments());
-	        comment.setCreated_as(dto.getCreated_as());
+    // ✅ Get all comments for a post
+    @GetMapping("/{postId}")
+    public ResponseEntity<List<ForumComments>> getCommentsForPost(@PathVariable Long postId) {
+        List<ForumComments> comments = commentsService.getCommentsByPostId(postId);
+        return ResponseEntity.ok(comments);
+    }
 
-	        return commentsService.createComment(comment);
-	    }
+    // ✅ Create a new comment (logged-in user only)
+    @PostMapping
+    public ResponseEntity<ForumComments> createComment(
+            @RequestBody ForumCommentsDTO dto,
+            Authentication authentication
+    ) {
+        // identify logged-in user
+        String userEmail = authentication.getName();
+        Users user = userRepo.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-    
+        // find post
+        ForumPost post = postRepo.findById(dto.getPostId())
+                .orElseThrow(() -> new RuntimeException("Post not found"));
 
+        // create entity
+        ForumComments comment = new ForumComments();
+        comment.setPostId(post);
+        comment.setUserId(user);
+        comment.setComments(dto.getComments());
+        comment.setCreatedAs(dto.getCreatedAs());
 
+        ForumComments savedComment = commentsService.createComment(comment);
+
+        return ResponseEntity.ok(savedComment);
+    }
+
+    // ✅ Delete comment (only owner)
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> deleteComment(
+            @PathVariable Long commentId,
+            Authentication authentication
+    ) {
+        String userEmail = authentication.getName();
+        Users user = userRepo.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        ForumComments comment = commentsService.getCommentById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment not found"));
+
+        if (!comment.getUserId().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        commentsService.deleteComment(commentId);
+        return ResponseEntity.ok().build();
+    }
 }

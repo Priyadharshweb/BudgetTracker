@@ -21,25 +21,26 @@ public class TransactionService {
     @Autowired
     private UserRepository userRepo;
 
-    // 🔹 Create new transaction
+    // Create transaction
     public Transactions creatingTransaction(Transactions data) {
         return transRepo.save(data);
     }
 
-    // 🔹 Get all transactions
+    // Get all transactions (used by admin or controller internal)
     public List<Transactions> fetchTransactions() {
         return transRepo.findAll();
     }
 
-    // 🔹 Get transaction by ID
+    // Get by ID
     public Transactions findById(long id) {
         return transRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transaction not found with ID: " + id));
     }
 
-    // 🔹 Update transaction
+    // Update transaction
     public String updateTransaction(long id, TransactionRequestDTO dto) {
         Optional<Transactions> optionalTrans = transRepo.findById(id);
+
         if (optionalTrans.isPresent()) {
             Transactions transaction = optionalTrans.get();
 
@@ -60,7 +61,7 @@ public class TransactionService {
         }
     }
 
-    // 🔹 Delete transaction
+    // Delete
     public String deleteTransaction(long id) {
         if (transRepo.existsById(id)) {
             transRepo.deleteById(id);

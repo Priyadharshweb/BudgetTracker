@@ -25,35 +25,43 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtFilter;
 
-    // Password encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Authentication manager
     @Bean
     public AuthenticationManager authManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // Security filter chain
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
+
             .authorizeHttpRequests(auth -> auth
-            	    .requestMatchers("/api/auth/**").permitAll()
-            	    .requestMatchers("/api/transaction/**").hasAnyAuthority("USER", "ADMIN")  // Changed this line
-            	    .requestMatchers("/api/budget/**").permitAll()
-            	    .requestMatchers("/api/savings/**").permitAll()
-            	    .requestMatchers("/api/exports/**").permitAll()
-            	    .requestMatchers("/api/forumposts/**").permitAll()
-            	    .requestMatchers("/api/comments/**").permitAll()
-            	    .requestMatchers("/api/users/**").hasAuthority("ADMIN")
-            	    .anyRequest().authenticated()
-            	)
+                // Public endpoints
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/forumposts/**").permitAll()
+                .requestMatchers("/api/comments/**").permitAll()
+
+                // Admin Only endpoints
+                .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                .requestMatchers("/api/users/**").hasAuthority("ADMIN")
+
+                // User + Admin endpoints
+                .requestMatchers("/api/transaction/**").hasAnyAuthority("USER", "ADMIN")
+                .requestMatchers("/api/budget/**").hasAnyAuthority("USER", "ADMIN")
+                .requestMatchers("/api/savings/**").hasAnyAuthority("USER", "ADMIN")
+                .requestMatchers("/api/exports/**").hasAnyAuthority("USER", "ADMIN")
+                .requestMatchers("/api/predict/**").hasAnyAuthority("USER", "ADMIN")
+                .requestMatchers("/api/user/**").hasAnyAuthority("USER", "ADMIN")
+
+                // Everything else requires authentication
+                .anyRequest().authenticated()
+            )
 
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -61,12 +69,11 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // CORS configuration
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.addAllowedOriginPattern("*");
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
 

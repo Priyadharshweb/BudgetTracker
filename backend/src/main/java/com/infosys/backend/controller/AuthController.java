@@ -16,6 +16,8 @@ import com.infosys.backend.repository.UserRepository;
 import com.infosys.backend.security.JwtUtil;
 
 import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
@@ -85,7 +87,13 @@ public class AuthController {
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             String token = jwtUtil.generateToken(users);
-            return ResponseEntity.ok(new JwtResponse(token));
+            
+            // Create response with both token and user
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("user", users);
+            
+            return ResponseEntity.ok(response);
 
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(401).body("Invalid email or password");

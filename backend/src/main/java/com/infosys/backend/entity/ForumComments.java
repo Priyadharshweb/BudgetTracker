@@ -2,6 +2,7 @@ package com.infosys.backend.entity;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -16,6 +17,7 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name="forumcomments")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ForumComments {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,15 +25,16 @@ public class ForumComments {
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "post_id", nullable = false)
-	private ForumPost post_id;
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	private ForumPost postId;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
-	private Users user_id;
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password"})
+	private Users userId;
 	
 	@Column(name="comments")
 	private String comments;
 	@Column(name="created_as")
-	private LocalDateTime created_as;
-
+	private LocalDateTime createdAs;
 }

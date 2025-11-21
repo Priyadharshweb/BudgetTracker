@@ -1,6 +1,6 @@
 package com.infosys.backend.entity;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +14,7 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name="users")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "password"})
 public class Users {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +31,4 @@ public class Users {
     
     @Enumerated(EnumType.STRING)
     private Role role;
-
-
 }

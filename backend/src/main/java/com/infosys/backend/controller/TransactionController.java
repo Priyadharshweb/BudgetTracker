@@ -22,41 +22,49 @@ public class TransactionController {
     @Autowired
     private UserRepository userRepository;
 
-    // ✅ Get all transactions for logged-in user only
+    // 🔹 Get all transactions FOR LOGGED-IN USER
     @GetMapping
     public ResponseEntity<List<Transactions>> getTransactions(Authentication authentication) {
         String userEmail = authentication.getName();
+
         Users user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // ✅ Fetch transactions only for this user
         List<Transactions> transactions = transactionRepository.findByUser(user);
         return ResponseEntity.ok(transactions);
     }
 
-    // ✅ Create transaction for logged-in user
+    // 🔹 Create new transaction FOR LOGGED-IN USER
     @PostMapping
-    public ResponseEntity<Transactions> createTransaction(@RequestBody Transactions transaction, Authentication authentication) {
+    public ResponseEntity<Transactions> createTransaction(
+            @RequestBody Transactions transaction,
+            Authentication authentication) {
+
         String userEmail = authentication.getName();
+
         Users user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        transaction.setUser(user); // ✅ assign current user
-        Transactions savedTransaction = transactionRepository.save(transaction);
-        return ResponseEntity.ok(savedTransaction);
+        transaction.setUser(user);
+        return ResponseEntity.ok(transactionRepository.save(transaction));
     }
 
-    // ✅ Update transaction only if belongs to logged-in user
+    // 🔹 Update transaction (only owner can update)
     @PutMapping("/{id}")
-    public ResponseEntity<Transactions> updateTransaction(@PathVariable Long id, @RequestBody Transactions transaction, Authentication authentication) {
+    public ResponseEntity<Transactions> updateTransaction(
+            @PathVariable Long id,
+            @RequestBody Transactions transaction,
+            Authentication authentication) {
+
         String userEmail = authentication.getName();
+
         Users user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Transactions existingTransaction = transactionRepository.findById(id)
+        Transactions existing = transactionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transaction not found"));
 
-        if (!existingTransaction.getUser().getId().equals(user.getId())) {
+        if (!existing.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("Unauthorized access");
         }
 
@@ -65,10 +73,14 @@ public class TransactionController {
         return ResponseEntity.ok(transactionRepository.save(transaction));
     }
 
-    // ✅ Delete transaction only if belongs to logged-in user
+    // 🔹 Delete (only owner can delete)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTransaction(@PathVariable Long id, Authentication authentication) {
+    public ResponseEntity<Void> deleteTransaction(
+            @PathVariable Long id,
+            Authentication authentication) {
+
         String userEmail = authentication.getName();
+
         Users user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
