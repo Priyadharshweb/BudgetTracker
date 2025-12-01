@@ -25,11 +25,7 @@ public class AdminController {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    @Autowired
-    private BudgetRepository budgetRepository;
-
-    @Autowired
-    private SavingsRepository savingsRepository;
+    
 
     @GetMapping("/users")
     public ResponseEntity<List<Users>> getAllUsers() {
@@ -47,13 +43,13 @@ public class AdminController {
     }
 
 
-    @GetMapping("/budgets")
-    public ResponseEntity<List<Budget>> getAllBudgets() {
-        return ResponseEntity.ok(budgetRepository.findAll());
-    }
-
-    @GetMapping("/savings")
-    public ResponseEntity<List<Savings>> getAllSavings() {
-        return ResponseEntity.ok(savingsRepository.findAll());
-    }
+//    @GetMapping("/budgets")
+//    public ResponseEntity<List<Budget>> getAllBudgets() {
+//        return ResponseEntity.ok(budgetRepository.findAll());
+//    }
+//
+//    @GetMapping("/savings")
+//    public ResponseEntity<List<Savings>> getAllSavings() {
+//        return ResponseEntity.ok(savingsRepository.findAll());
+//    }
 }
