@@ -1,16 +1,18 @@
 package com.infosys.backend.security;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,47 +25,59 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtUtil jwtUtil;
 
     @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
+ // List of public endpoints that don't need authentication
+    private final List<String> publicEndpoints = Arrays.asList(
+        "/api/auth/login",
+        "/api/auth/signup"
+    );
 
-    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        return pathMatcher.match("/api/auth/**", request.getServletPath());
-    }
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+        String requestPath = request.getRequestURI();
+        
+        // Skip JWT processing for public endpoints
+        if (isPublicEndpoint(requestPath)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         String authHeader = request.getHeader("Authorization");
+        String token = null;
+        String username = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            String email = jwtUtil.extractUsername(token);
-            String role = jwtUtil.extractRole(token);
+            token = authHeader.substring(7);
+            try {
+                username = jwtUtil.extractUsername(token);
+            } catch (Exception e) {
+                logger.error("JWT token extraction failed", e);
+            }
+        }
 
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-
-                if (jwtUtil.validateToken(token)) {
-                	UsernamePasswordAuthenticationToken authToken =
-                		    new UsernamePasswordAuthenticationToken(
-                		        userDetails,
-                		        null,
-                		        List.of(new SimpleGrantedAuthority(role))
-                		    );
-                    authToken.setDetails(
-                            new org.springframework.security.web.authentication.WebAuthenticationDetailsSource()
-                                    .buildDetails(request)
-                    );
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            try {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                
+                if (jwtUtil.validateToken(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = 
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
+            } catch (Exception e) {
+                logger.error("Authentication failed", e);
             }
         }
 
         filterChain.doFilter(request, response);
     }
-}
 
+    private boolean isPublicEndpoint(String requestPath) {
+        return publicEndpoints.stream().anyMatch(endpoint -> requestPath.startsWith(endpoint));
+    }
+}

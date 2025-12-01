@@ -34,7 +34,6 @@ public class SecurityConfig {
     public AuthenticationManager authManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -44,20 +43,20 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/forumposts/**").permitAll()
-                .requestMatchers("/api/comments/**").permitAll()
 
                 // Admin Only endpoints
                 .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                 .requestMatchers("/api/users/**").hasAuthority("ADMIN")
 
-                // User + Admin endpoints
+                // User + Admin endpoints (including forum)
                 .requestMatchers("/api/transaction/**").hasAnyAuthority("USER", "ADMIN")
                 .requestMatchers("/api/budget/**").hasAnyAuthority("USER", "ADMIN")
                 .requestMatchers("/api/savings/**").hasAnyAuthority("USER", "ADMIN")
                 .requestMatchers("/api/exports/**").hasAnyAuthority("USER", "ADMIN")
                 .requestMatchers("/api/predict/**").hasAnyAuthority("USER", "ADMIN")
                 .requestMatchers("/api/user/**").hasAnyAuthority("USER", "ADMIN")
+                .requestMatchers("/api/forumposts/**").hasAnyAuthority("USER", "ADMIN")
+                .requestMatchers("/api/comments/**").hasAnyAuthority("USER", "ADMIN")
 
                 // Everything else requires authentication
                 .anyRequest().authenticated()
@@ -68,6 +67,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
