@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import AfterLogin from '../navigationBar/AfterLogin';
+import AdminNav from './AdminNav';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './adminDashboard.css';
@@ -125,7 +125,7 @@ const TransactionAdminPage = () => {
   if (loading) {
     return (
       <>
-        <AfterLogin />
+        <AdminNav />
         <div style={{ padding: '50px', textAlign: 'center' }}>
           <h2>Loading Transactions...</h2>
         </div>
@@ -135,7 +135,7 @@ const TransactionAdminPage = () => {
 
   return (
     <>
-      <AfterLogin />
+      <AdminNav />
       <div className="admin-dashboard">
         <div className="admin-header">
           <h1>Transaction Management</h1>

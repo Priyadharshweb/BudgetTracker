@@ -136,6 +136,12 @@ const AfterLogin = () => {
       navigate('/admin-users');
     }
   };
+  const handleBudget=()=>{
+    navigate('/budget');
+  };
+  const handleSavings=()=>{
+    navigate('/savings');
+  };
 
   return (
     <nav className="navbar">
@@ -167,6 +173,32 @@ const AfterLogin = () => {
             }}
           >
             Transaction
+          </li>
+          <li 
+            onClick={handleBudget}
+            style={{
+              backgroundColor: location.pathname === '/budget' ? 'rgb(52, 101, 109)' : 'transparent',
+              color: location.pathname === '/budget' ? 'white' : '#666',
+              borderRadius: '25px',
+              padding: '8px 16px',
+              transition: 'all 0.3s ease',
+              cursor: 'pointer'
+            }}
+          >
+            Budget
+          </li>
+          <li 
+            onClick={handleSavings}
+            style={{
+              backgroundColor: location.pathname === '/savings' ? 'rgb(52, 101, 109)' : 'transparent',
+              color: location.pathname === '/savings' ? 'white' : '#666',
+              borderRadius: '25px',
+              padding: '8px 16px',
+              transition: 'all 0.3s ease',
+              cursor: 'pointer'
+            }}
+          >
+            Savings
           </li>
           {userRole === 'ADMIN' && (
             <li 

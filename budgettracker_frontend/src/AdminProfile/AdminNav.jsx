@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaUser, FaChevronDown } from 'react-icons/fa';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import './AfterLogin.css';
+import '../navigationBar/AfterLogin.css';
 import { useAuth } from '../context/AuthContext';
 import { authAPI, budgetAPI, transactionAPI } from '../services/api';
 
@@ -116,26 +116,14 @@ const AdminNav = () => {
   // const handleFeatures = () => navigate('/features');
   // const handleAboutus = () => navigate('/aboutUs');
   const handleUserDash = () => {
-    if (userRole === 'ADMIN') {
-      navigate('/admin-dashboard');
-      setAdminActiveTab('dashboard');
-    } else {
-      navigate('/userDashboard');
-      checkBudgetNotifications();
-    }
+    navigate('/admin-dashboard');
+    setAdminActiveTab('dashboard');
   };
   const handleTransaction=()=> {
-    if (userRole === 'ADMIN') {
-      navigate('/admin-transactions');
-    } else {
-      navigate('/transaction');
-    }
+    navigate('/admin-transactions');
   };
   const handleUsers=()=>{
-    if (userRole === 'ADMIN') {
-      navigate('/admin-dashboard');
-      setAdminActiveTab('users');
-    }
+    navigate('/admin-users');
   };
 
   return (
@@ -146,8 +134,8 @@ const AdminNav = () => {
           <li 
             onClick={handleUserDash} 
             style={{
-              backgroundColor: (location.pathname === '/userDashboard' || (location.pathname === '/admin-dashboard' && adminActiveTab === 'dashboard')) ? 'rgb(52, 101, 109)' : 'transparent',
-              color: (location.pathname === '/userDashboard' || (location.pathname === '/admin-dashboard' && adminActiveTab === 'dashboard')) ? 'white' : '#666',
+              backgroundColor: location.pathname === '/admin-dashboard' ? 'rgb(52, 101, 109)' : 'transparent',
+              color: location.pathname === '/admin-dashboard' ? 'white' : '#666',
               borderRadius: '25px',
               padding: '8px 16px',
               transition: 'all 0.3s ease',
@@ -159,8 +147,8 @@ const AdminNav = () => {
           <li 
             onClick={handleTransaction}
             style={{
-              backgroundColor: (location.pathname === '/transaction' || location.pathname === '/admin-transactions') ? 'rgb(52, 101, 109)' : 'transparent',
-              color: (location.pathname === '/transaction' || location.pathname === '/admin-transactions') ? 'white' : '#666',
+              backgroundColor: location.pathname === '/admin-transactions' ? 'rgb(52, 101, 109)' : 'transparent',
+              color: location.pathname === '/admin-transactions' ? 'white' : '#666',
               borderRadius: '25px',
               padding: '8px 16px',
               transition: 'all 0.3s ease',
@@ -169,21 +157,19 @@ const AdminNav = () => {
           >
             Transaction
           </li>
-          {userRole === 'ADMIN' && (
-            <li 
-              onClick={handleUsers}
-              style={{
-                backgroundColor: (location.pathname === '/admin-dashboard' && adminActiveTab === 'users') ? 'rgb(52, 101, 109)' : 'transparent',
-                color: (location.pathname === '/admin-dashboard' && adminActiveTab === 'users') ? 'white' : '#666',
-                borderRadius: '25px',
-                padding: '8px 16px',
-                transition: 'all 0.3s ease',
-                cursor: 'pointer'
-              }}
-            >
-              Users
-            </li>
-          )}
+          <li 
+            onClick={handleUsers}
+            style={{
+              backgroundColor: location.pathname === '/admin-users' ? 'rgb(52, 101, 109)' : 'transparent',
+              color: location.pathname === '/admin-users' ? 'white' : '#666',
+              borderRadius: '25px',
+              padding: '8px 16px',
+              transition: 'all 0.3s ease',
+              cursor: 'pointer'
+            }}
+          >
+            Users
+          </li>
         </ul>
       </div>
       <div className="nav-right">

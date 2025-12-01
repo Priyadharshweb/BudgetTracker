@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import AfterLogin from '../navigationBar/AfterLogin';
+import AdminNav from './AdminNav';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -22,6 +22,11 @@ const AdminDashboard = () => {
       navigate('/login', { replace: true });
       return;
     }
+    // Check if user is admin
+    if (auth?.user?.role !== 'ADMIN') {
+      navigate('/user-dashboard', { replace: true });
+      return;
+    }
     fetchAdminData();
   }, [auth, navigate]);
 
@@ -40,19 +45,41 @@ const AdminDashboard = () => {
         fetch('http://localhost:8080/api/admin/savings', { headers })
       ]);
 
-      // If any admin endpoint returns 403, user is not admin
+      // Handle admin endpoints - continue even if some fail
       if (usersRes.status === 403 || transactionsRes.status === 403 || budgetsRes.status === 403 || savingsRes.status === 403) {
-        navigate('/user-dashboard', { replace: true });
-        return;
+        console.warn('Some admin endpoints returned 403 - continuing with available data');
       }
 
-      if (usersRes.ok) setUsers(await usersRes.json());
-      if (transactionsRes.ok) setTransactions(await transactionsRes.json());
-      if (budgetsRes.ok) setBudgets(await budgetsRes.json());
-      if (savingsRes.ok) setSavings(await savingsRes.json());
+      if (usersRes.ok) {
+        setUsers(await usersRes.json());
+      } else {
+        console.warn('Users endpoint failed:', usersRes.status);
+        setUsers([]);
+      }
+      
+      if (transactionsRes.ok) {
+        setTransactions(await transactionsRes.json());
+      } else {
+        console.warn('Transactions endpoint failed:', transactionsRes.status);
+        setTransactions([]);
+      }
+      
+      if (budgetsRes.ok) {
+        setBudgets(await budgetsRes.json());
+      } else {
+        console.warn('Budgets endpoint failed:', budgetsRes.status);
+        setBudgets([]);
+      }
+      
+      if (savingsRes.ok) {
+        setSavings(await savingsRes.json());
+      } else {
+        console.warn('Savings endpoint failed:', savingsRes.status);
+        setSavings([]);
+      }
     } catch (error) {
       console.error('Error fetching admin data:', error);
-      navigate('/user-dashboard', { replace: true });
+      navigate('/login', { replace: true });
     } finally {
       setLoading(false);
     }
@@ -177,7 +204,7 @@ const AdminDashboard = () => {
   if (loading) {
     return (
       <>
-        <AfterLogin />
+        <AdminNav />
         <div style={{ padding: '50px', textAlign: 'center' }}>
           <h2>Loading Admin Dashboard...</h2>
         </div>
@@ -187,7 +214,7 @@ const AdminDashboard = () => {
 
   return (
     <>
-      <AfterLogin />
+      <AdminNav />
       <div className="admin-dashboard">
         <div className="admin-header">
           <h1>Admin Dashboard</h1>
