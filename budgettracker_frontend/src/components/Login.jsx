@@ -4,17 +4,42 @@ import './Login.css'
 import BeforeLoginNav from '../navigationBar/BeforeLoginNav'
 import { useAuth } from '../context/AuthContext'
 import { authAPI } from '../services/api'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
   const auth = useAuth()
   const login = auth?.login || (() => {})
 
+  const validatePassword = (password) => {
+    const hasUpperCase = /[A-Z]/.test(password)
+    const hasNumber = /[0-9]/.test(password)
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    
+    if (!hasUpperCase) return 'Password must contain at least one uppercase letter'
+    if (!hasNumber) return 'Password must contain at least one number'
+    if (!hasSpecialChar) return 'Password must contain at least one special character'
+    return ''
+  }
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    // Validate password before submitting
+    const passwordValidationError = validatePassword(password)
+    if (passwordValidationError) {
+      setPasswordError(passwordValidationError)
+      return
+    }
+    
     try {
       const response = await authAPI.login({ email, password })
       console.log('Login response:', response.data)
@@ -68,13 +93,33 @@ const Login = () => {
 
             <div className="input-group">
               <label>Password</label>
-              <input
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value)
+                    setPasswordError('') // Clear error when typing
+                  }}
+                  required
+                  style={{ paddingRight: '40px' }}
+                />
+                <span 
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer',
+                    color: '#666'
+                  }}
+                >
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </span>
+              </div>
+              {passwordError && <div style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>{passwordError}</div>}
             </div>
 
             <div className="form-options">

@@ -35,7 +35,23 @@ api.interceptors.response.use(
 
 export const authAPI = {
   login: (credentials) => api.post('/auth/login', credentials),
-  signup: (userData) => api.post('/auth/signup', userData),
+  signup: async (userData) => {
+    const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(userData)
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || `Signup failed with status ${response.status}`);
+    }
+    
+    const data = await response.text();
+    return { data };
+  },
   getProfile: () => api.get('/auth/profile'),
 }
 

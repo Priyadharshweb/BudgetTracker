@@ -112,6 +112,17 @@ const AdminDashboard = () => {
   };
 
   const getChartData = () => {
+    if (transactions.length === 0) {
+      // Sample data for demonstration
+      return [
+        { month: 'Jan', income: 45000, expenses: 32000 },
+        { month: 'Feb', income: 52000, expenses: 38000 },
+        { month: 'Mar', income: 48000, expenses: 35000 },
+        { month: 'Apr', income: 61000, expenses: 42000 },
+        { month: 'May', income: 55000, expenses: 39000 },
+        { month: 'Jun', income: 67000, expenses: 45000 }
+      ];
+    }
     const monthlyData = {};
     transactions.forEach(t => {
       const month = new Date(t.date).toLocaleDateString('en-US', { month: 'short' });
@@ -123,6 +134,17 @@ const AdminDashboard = () => {
   };
 
   const getCategoryData = () => {
+    if (transactions.length === 0) {
+      // Sample expense categories data
+      return [
+        { name: 'Food', value: 15000 },
+        { name: 'Travel', value: 12000 },
+        { name: 'Bills', value: 8000 },
+        { name: 'Shopping', value: 6000 },
+        { name: 'Entertainment', value: 4000 },
+        { name: 'Other', value: 3000 }
+      ];
+    }
     const categoryTotals = {};
     transactions.filter(t => t.type === 'expense').forEach(t => {
       const category = t.category || 'Other';
@@ -132,6 +154,17 @@ const AdminDashboard = () => {
   };
 
   const getUserRegistrationData = () => {
+    if (users.length === 0) {
+      // Sample user registration data
+      return [
+        { month: 'Jan 24', users: 25 },
+        { month: 'Feb 24', users: 32 },
+        { month: 'Mar 24', users: 28 },
+        { month: 'Apr 24', users: 45 },
+        { month: 'May 24', users: 38 },
+        { month: 'Jun 24', users: 52 }
+      ];
+    }
     const registrationData = {};
     users.forEach(user => {
       const month = new Date(user.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
@@ -143,6 +176,15 @@ const AdminDashboard = () => {
   const getBudgetSavingsData = () => {
     const totalBudgets = getTotalBudgetAmount();
     const totalSavings = getTotalSavingsAmount();
+    
+    if (totalBudgets === 0 && totalSavings === 0) {
+      // Sample budget vs savings data
+      return [
+        { name: 'Budgets', value: 85000, color: '#FF6B6B' },
+        { name: 'Savings', value: 65000, color: '#4ECDC4' }
+      ];
+    }
+    
     return [
       { name: 'Budgets', value: totalBudgets, color: '#FF6B6B' },
       { name: 'Savings', value: totalSavings, color: '#4ECDC4' }
@@ -269,27 +311,34 @@ const AdminDashboard = () => {
 
             <div className="charts-section">
               <div className="chart-container">
-                <h3>Monthly Income vs Expenses</h3>
+                <h3>📊 Monthly Income vs Expenses Trend</h3>
+                <p style={{fontSize: '12px', color: '#666', margin: '5px 0 15px 0'}}>Track monthly financial performance across all users</p>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={getChartData()}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="income" fill="#28a745" name="Income" />
-                    <Bar dataKey="expenses" fill="#dc3545" name="Expenses" />
+                  <BarChart data={getChartData()} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="month" tick={{fontSize: 12}} />
+                    <YAxis tick={{fontSize: 12}} />
+                    <Tooltip 
+                      formatter={(value, name) => [`₹${value.toLocaleString()}`, name]}
+                      labelStyle={{color: '#333'}}
+                      contentStyle={{backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '4px'}}
+                    />
+                    <Legend />
+                    <Bar dataKey="income" fill="#28a745" name="Income" radius={[2, 2, 0, 0]} />
+                    <Bar dataKey="expenses" fill="#dc3545" name="Expenses" radius={[2, 2, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
 
               <div className="chart-container">
-                <h3>Expense Categories</h3>
+                <h3>🎯 Expense Categories Distribution</h3>
+                <p style={{fontSize: '12px', color: '#666', margin: '5px 0 15px 0'}}>Breakdown of spending across different categories</p>
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie 
                       data={getCategoryData()} 
                       cx="50%" 
-                      cy="50%" 
+                      cy="45%" 
                       outerRadius={70} 
                       dataKey="value"
                     >
@@ -297,43 +346,78 @@ const AdminDashboard = () => {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => [`₹${value.toFixed(2)}`, 'Amount']} />
-                    <Legend />
+                    <Tooltip 
+                      formatter={(value) => [`₹${value.toLocaleString()}`, 'Amount']}
+                      contentStyle={{backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '4px'}}
+                    />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={60}
+                      iconType="circle"
+                      wrapperStyle={{fontSize: '12px', paddingTop: '10px'}}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
 
               <div className="chart-container">
-                <h3>User Registration Trends</h3>
+                <h3>📈 User Registration Growth</h3>
+                <p style={{fontSize: '12px', color: '#666', margin: '5px 0 15px 0'}}>Monthly new user registrations over time</p>
                 <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={getUserRegistrationData()}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Area type="monotone" dataKey="users" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+                  <AreaChart data={getUserRegistrationData()} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <defs>
+                      <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#8884d8" stopOpacity={0.1}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="month" tick={{fontSize: 12}} />
+                    <YAxis tick={{fontSize: 12}} />
+                    <Tooltip 
+                      formatter={(value) => [`${value} users`, 'New Registrations']}
+                      labelStyle={{color: '#333'}}
+                      contentStyle={{backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '4px'}}
+                    />
+                    <Area 
+                      type="monotone" 
+                      dataKey="users" 
+                      stroke="#8884d8" 
+                      fillOpacity={1} 
+                      fill="url(#colorUsers)"
+                      strokeWidth={2}
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
 
               <div className="chart-container">
-                <h3>Budget vs Savings Distribution</h3>
+                <h3>💰 Budget vs Savings Overview</h3>
+                <p style={{fontSize: '12px', color: '#666', margin: '5px 0 15px 0'}}>Total allocated budgets compared to savings goals</p>
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie 
                       data={getBudgetSavingsData()} 
                       cx="50%" 
-                      cy="50%" 
+                      cy="45%" 
                       innerRadius={40}
-                      outerRadius={80} 
+                      outerRadius={75} 
                       dataKey="value"
-                      label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}
                     >
                       {getBudgetSavingsData().map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => [`₹${value.toFixed(2)}`, 'Amount']} />
+                    <Tooltip 
+                      formatter={(value) => [`₹${value.toLocaleString()}`, 'Amount']}
+                      contentStyle={{backgroundColor: '#fff', border: '1px solid #ccc', borderRadius: '4px'}}
+                    />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={50}
+                      iconType="circle"
+                      wrapperStyle={{fontSize: '12px', paddingTop: '10px'}}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </div>

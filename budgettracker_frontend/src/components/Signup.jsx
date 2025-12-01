@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import './Signup.css'
 import BeforeLoginNav from '../navigationBar/BeforeLoginNav'
 import { authAPI } from '../services/api'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -14,19 +16,46 @@ const Signup = () => {
 
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
 
+  const validatePassword = (password) => {
+    const hasUpperCase = /[A-Z]/.test(password)
+    const hasNumber = /[0-9]/.test(password)
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    
+    if (!hasUpperCase) return 'Password must contain at least one uppercase letter'
+    if (!hasNumber) return 'Password must contain at least one number'
+    if (!hasSpecialChar) return 'Password must contain at least one special character'
+    return ''
+  }
+
   const handleChange = (e) => {
+    const { name, value } = e.target
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     })
+    
+    // Clear password error when typing
+    if (name === 'password') {
+      setPasswordError('')
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setSuccess('')
+    
+    // Validate password before submitting
+    const passwordValidationError = validatePassword(formData.password)
+    if (passwordValidationError) {
+      setPasswordError(passwordValidationError)
+      return
+    }
+    
     try {
       const response = await authAPI.signup({
         name: formData.name,
@@ -39,11 +68,7 @@ const Signup = () => {
       setTimeout(() => navigate('/login'), 2000)
     } catch (err) {
       console.error('Signup error:', err)
-      if (err.response && err.response.data) {
-        setError(err.response.data)
-      } else {
-        setError('Signup failed. Please check your internet connection or try again.')
-      }
+      setError(err.message || 'Signup failed. Please check your internet connection or try again.')
     }
   }
 
@@ -82,14 +107,31 @@ const Signup = () => {
               />
             </div>
             <div className="input-group">
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  style={{ paddingRight: '40px' }}
+                />
+                <span 
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer',
+                    color: '#666'
+                  }}
+                >
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </span>
+              </div>
+              {passwordError && <div style={{ color: 'red', fontSize: '12px', marginTop: '5px' }}>{passwordError}</div>}
             </div>
             <div className="input-group">
               <select
